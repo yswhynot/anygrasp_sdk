@@ -44,6 +44,53 @@ AnyGrasp SDK for grasp detection & tracking.
 ## Installation
 1. Follow MinkowskiEngine [instructions](https://github.com/NVIDIA/MinkowskiEngine#anaconda) to install [Anaconda](https://www.anaconda.com/), cudatoolkit, Pytorch and MinkowskiEngine. If you are using CUDA 12.1 and encounter compatibility issue when installing MinkowskiEngine, you could try [this branch](https://github.com/chenxi-wang/MinkowskiEngine/tree/cuda-12-1). **Note that you need ``export MAX_JOBS=2;`` before ``pip install`` if you are running on an laptop due to [this issue](https://github.com/NVIDIA/MinkowskiEngine/issues/228)**. If PyTorch reports a compatibility issue during program execution, you can re-install PyTorch via Pip instead of Anaconda.
 
+Here's one case of Minkowski-Engine installation:
+
+a. install cudatoolkit 11.8 on Ubuntu 22.04
+```
+wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda_11.8.0_520.61.05_linux.run
+
+sudo sh cuda_11.8.0_520.61.05_linux.run
+
+# if not using sudo:
+chmod +x cuda_11.8.0_520.61.05_linux.run
+
+./cuda_11.8.0_520.61.05_linux.run --installpath=~/cuda-11.8
+
+export PATH=~/cuda-11.8/bin:$PATH
+export LD_LIBRARY_PATH=~/cuda-11.8/lib64:$LD_LIBRARY_PATH
+source ~/.bashrc
+
+nvcc --version
+```
+Hint: press space to disselect driverOption to prevent the driver from being overwritten. You can check with ```ls /usr/local/cuda**``` to see if cuda-11.8 has already been installed.
+
+
+b. create your environment with mamba or conda
+```
+conda create -n anygrasp python=3.9
+
+conda activate anygrasp
+
+# install torch (cuda-11.8) to match the cudatoolkit version
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 
+
+# install dependencies
+conda install openblas-devel -c anaconda 
+
+export CUDA_HOME=/usr/local/cuda-11.8
+
+# if you need to convert to other gcc/g++ versions:
+sudo apt update
+sudo apt install gcc-10 g++-10 gcc-9 g++-9
+
+export CXX=g++-11 
+
+git clone https://github.com/NVIDIA/MinkowskiEngine.git
+cd MinkowskiEngine
+python setup.py install --blas_include_dirs=${CONDA_PREFIX}/include --blas=openblas
+```
+
 2. Install other requirements from Pip.
 ```bash
     pip install -r requirements.txt
