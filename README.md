@@ -89,6 +89,8 @@ export CXX=g++-11
 git clone https://github.com/NVIDIA/MinkowskiEngine.git
 cd MinkowskiEngine
 python setup.py install --blas_include_dirs=${CONDA_PREFIX}/include --blas=openblas
+# if openblas.so cannot be found, add -L path.
+export LDFLAGS="-L${CONDA_PREFIX}/lib $LDFLAGS"
 ```
 
 2. Install other requirements from Pip.
