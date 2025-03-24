@@ -13,17 +13,18 @@ from graspnetAPI import GraspGroup
 parser = argparse.ArgumentParser()
 parser.add_argument('--checkpoint_path', required=True, help='Model checkpoint path')
 parser.add_argument('--max_gripper_width', type=float, default=0.15, help='Maximum gripper width (<=0.1m)')
-parser.add_argument('--gripper_height', type=float, default=0.02, help='Gripper height')
+parser.add_argument('--gripper_height', type=float, default=0.05, help='Gripper height')
 parser.add_argument('--camera_height', type=float, default=0.5, help='Camera height')
 parser.add_argument('--top_down_grasp', action='store_true', help='Output top-down grasps.')
 parser.add_argument('--debug', action='store_true', help='Enable debug mode')
-parser.add_argument("--object_name", type=str, default="025_mug", help="Name of the object to load.")
+parser.add_argument("--object_name", type=str, default="006_mustard_bottle", help="Name of the object to load.")
 cfgs = parser.parse_args()
 cfgs.max_gripper_width = max(0, min(0.1, cfgs.max_gripper_width))
 
 def demo(data_dir):
     anygrasp = AnyGrasp(cfgs)
     anygrasp.load_net()
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
 
     # get data
     # colors = np.array(Image.open(os.path.join(data_dir, 'color.png')), dtype=np.float32) / 255.0
@@ -52,7 +53,7 @@ def demo(data_dir):
     # points = points[mask].astype(np.float32)
     # colors = colors[mask].astype(np.float32)
     
-    points = np.load(cfgs.object_name + ".npy")
+    points = np.load(curr_dir + "/point_clouds/" +cfgs.object_name + ".npy")
     mask = (points[:,2] > 0) & (points[:,2] < cfgs.camera_height + 1e-5)
     
     points = points[mask].astype(np.float32)
@@ -78,8 +79,10 @@ def demo(data_dir):
         T_arr = np.eye(4)
         T_arr[:3, :3] = gg[0].rotation_matrix
         T_arr[:3, 3] = gg[0].translation
-        np.save('/home/xueqian/xq/anygrasp_sdk/grasp_detection/pose_info/' + cfgs.object_name + '.npy', T_arr)
-        file_path = '/home/xueqian/xq/anygrasp_sdk/grasp_detection/pose_info/width_info.csv'
+        print("Rotation Matrix:", T_arr[:3, :3])
+        print("Translation Matrix:", T_arr[:3, 3])
+        np.save(curr_dir + '/pose_info/' + cfgs.object_name + '.npy', T_arr)
+        file_path = curr_dir + '/pose_info/width_info.csv'
         if not os.path.exists(file_path):
             df = pd.DataFrame()
         else:
@@ -101,7 +104,7 @@ def demo(data_dir):
             o3d.io.write_triangle_mesh(f"gripper_mesh/mesh_{i}.ply", mesh)  # save to ply file
         
         # save PointCloud
-        o3d.io.write_point_cloud("point_cloud.pcd", cloud)  # 保存为 PCD 文件
+        o3d.io.write_point_cloud("point_cloud.pcd", cloud)  
 
         # Visualize the geometry
         vis = o3d.visualization.Visualizer()

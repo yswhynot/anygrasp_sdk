@@ -1,6 +1,7 @@
-numpy
+numpy==1.23.4
 Pillow
+scikit-learn
 scipy
 tqdm
 graspnetAPI
-open3d
+open3d>=0.8.0.0
